@@ -8,6 +8,7 @@
 #include "timer.h"
 #include "lib/vehicle.h"
 #include "lib/door.h"
+#include "lib/mesh.h"
 
 class line_segment
 {
@@ -42,6 +43,7 @@ private:
          up_2, down_2, left_2, right_2,
          left_d1, right_d1, left_d2, right_d2;
     std::vector <Vehicle> vehicles;
+    Mesh sample;
     timer t;
     int selectedObject;
     int resolution;

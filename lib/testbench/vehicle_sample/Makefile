@@ -3,8 +3,8 @@ CXXFLAGS = -O3
 CPPFLAGS = -Wall -g
 LIBS  = -lGL -lGLU -lglut
 #LIBS = -lmingw32 -lglut32 -lopengl32 -lglu32
-OBJS  = gl_viewer.o gl_camera.o main.o application.o timer.o lib/door.o lib/vehicle.o
-SRCS = gl_viewer.cpp gl_camera.cpp main.cpp application.cpp timer.cpp lib/door.cpp lib/vehicle.cpp
+OBJS  = gl_viewer.o gl_camera.o main.o application.o timer.o lib/door.o lib/vehicle.o lib/mesh.o
+SRCS = gl_viewer.cpp gl_camera.cpp main.cpp application.cpp timer.cpp lib/door.cpp lib/vehicle.cpp lib/mesh.cpp
 TARGET = transform
 
 #%.o: %.cpp
@@ -21,5 +21,5 @@ clean:
 
 gl_viewer.o: gl_viewer.h gl_camera.h vector3.h
 main.o: application.h gl_viewer.h vector3.h
-application.o: application.h gl_viewer.h gl_camera.h vector3.h lib/door.h lib/vehicle.h
+application.o: application.h gl_viewer.h gl_camera.h vector3.h lib/door.h lib/vehicle.h lib/mesh.h
 timer.o: timer.h

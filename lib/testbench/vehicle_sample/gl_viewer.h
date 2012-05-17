@@ -24,26 +24,6 @@ class gl_viewer
             BUTTON_DOWN = GLUT_DOWN // button is being pressed
         };
 
-
-        // Polymorphic callback events. Implement in inheriting subclass.
-        //
-        // draw_event is called by glut when the screen needs to be
-        // redrawn. In this implementation this occurs during mouse
-        // and key inputs, as well as when the screen is resized,
-        // overlapped by other windows, or minimized and maximized.
-        //
-        // keyboard_event is called when a key is pressed. The
-        // character of the key as well as the x and y location of the
-        // mouse cursors current location are passed into this callback.
-        // The x and y value are in window coordinates.
-        //
-        // mouse_event is called when a button on the mouse
-        // is first pressed and then once again when it is released. The
-        // first parameter is the button id, the second parameter is
-        // whether the button is being pushed down or released, and
-        // finally x and y are once again the position of the mouse cursor
-        // during the event.
-
         virtual void init_event() {}
         virtual void draw_event() {}
         virtual void keyboard_event(unsigned char key, int x, int y) {}

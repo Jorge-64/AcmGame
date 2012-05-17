@@ -2,13 +2,13 @@
 //Lab 2: Line resterization
 //CS 130, Spring 2012
 
+#include "lib/mesh.h"
 #include "application.h"
 
 #include <iostream>
 #include <cassert>
 
 using namespace std;
-
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -65,6 +65,8 @@ void application::init_event()
     Vehicle car_2(false,0,2.5,3);
     vehicles.push_back(car_1);
     vehicles.push_back(car_2);
+
+    sample.load("cube.obj");
 }
 // triggered each time the application needs to redraw
 void application::draw_event()
@@ -86,6 +88,7 @@ void application::draw_event()
     /*
 
     double rel_dir = vehicles[0].direction - camera.get_twist();
+
     if(rel_dir > 95)
         camera.set_twist(camera.get_twist() + .1);
     else if(rel_dir < 85)
@@ -97,6 +100,8 @@ void application::draw_event()
             vehicles[i].draw(t.elapsed()*180,up_1,down_1,left_1,right_1,left_d1,right_d1);
         else
             vehicles[i].draw(t.elapsed()*180,up_2,down_2,left_2,right_2,left_d2,right_d2);
+    sample.draw();
+
     }
 }
 // triggered when mouse is clicked

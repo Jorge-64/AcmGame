@@ -1,7 +1,7 @@
 #include "application.h"
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 720
+#define HEIGHT 540
 
 int main(int argc, char* argv[])
 {

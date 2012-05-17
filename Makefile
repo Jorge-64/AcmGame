@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-g -Wall
 CPPFLAGS = -Wall -g
-LIBS  = -lGL -lGLU -lglut
+LIBS = -lGL -lGLU -lglut
 #LIBS = -lmingw32 -lglut32 -lopengl32 -lglu32
 
 export CXX
@@ -28,4 +28,3 @@ $(CLEANDIRS):
 	$(MAKE) -C $(@:clean-%=%) clean
 
 .PHONY: all clean $(TARGET) $(OBJS) $(SUBDIRS) $(CLEANDIRS)
-
