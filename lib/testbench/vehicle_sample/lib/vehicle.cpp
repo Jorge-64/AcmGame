@@ -14,7 +14,7 @@ Vehicle::Vehicle()
     wheels[1] = Tire();
     wheels[2] = Tire();
     wheels[3] = Tire();
-    
+
     doors[0] = Door();
     doors[1] = Door();
 
@@ -31,7 +31,7 @@ Vehicle::Vehicle(bool keys, double x, double y, double z)
     wheels[1] = Tire();
     wheels[2] = Tire();
     wheels[3] = Tire();
-    
+
     doors[0] = Door();
     doors[1] = Door();
 
@@ -41,8 +41,8 @@ Vehicle::Vehicle(bool keys, double x, double y, double z)
     doors[0].set_position(1.0,0.0,-1.5);
     doors[1].set_position(1.0,0.0,1.5);
     //to see how the doors break off immediately
-    //doors[0].break_off(x_pos + 4.0,y_pos,z_pos - 1.5);
-    //doors[1].break_off(x_pos + 4.0,y_pos,z_pos + 1.5);
+    doors[0].break_off(x_pos + 4.0,y_pos,z_pos - 1.5);
+    doors[1].break_off(x_pos + 4.0,y_pos,z_pos + 1.5);
 }
 
 Vehicle::~Vehicle()

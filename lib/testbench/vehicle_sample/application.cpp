@@ -3,6 +3,7 @@
 //CS 130, Spring 2012
 
 #include "lib/mesh.h"
+#include "lib/input.h"
 #include "application.h"
 
 #include <iostream>
@@ -14,7 +15,7 @@ using namespace std;
 #include <GL/glu.h>
 #include <GL/glut.h>
 
-#include "lib/input.h"
+#define PI 3.14159265358979323846264338328
 
 void draw_grid();
 
@@ -85,43 +86,44 @@ void application::draw_event()
     glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
 
     // draws the grid and frame at the origin
+    // to be replaced with a draw terrain function
     draw_grid();
 
-    #define PI 3.14159265358979323846264338328
-    
     //draw the vehicles
     camera.set_focal_point(vehicles[0].x_pos + 3.2 * cos(vehicles[0].direction * PI / 180.0),vehicles[0].y_pos + 2,vehicles[0].z_pos + 3.2 * -sin(vehicles[0].direction * PI / 180.0));
+    switch(vehicles[0].){
+        case 0:
+            static float relative_twist = 0.0f; //Yes, this is a hack.  Please fix it.
+            relative_twist -= Input::mouseX() * Input::getMouseSensitivity();
+            while(relative_twist >= 360.0f) relative_twist -= 360.0f;
+            while(relative_twist < 0.0f) relative_twist += 360.0f;
+            camera.set_twist(vehicles[0].direction - 90 + relative_twist);
 
-    static float relative_twist = 0.0f; //Yes, this is a hack.  Please fix it.
-    relative_twist -= Input::mouseX() * Input::getMouseSensitivity();
-    while(relative_twist >= 360.0f) relative_twist -= 360.0f;
-    while(relative_twist < 0.0f) relative_twist += 360.0f;
-    camera.set_twist(vehicles[0].direction - 90 + relative_twist);
-    
-    camera.set_elevation(camera.get_elevation() + Input::mouseY() * Input::getMouseSensitivity());
-    if(camera.get_elevation() > 90.0f) camera.set_elevation(90.0f);
-    if(camera.get_elevation() < 0.0f) camera.set_elevation(0.0f);
-    /*
+            camera.set_elevation(camera.get_elevation() + Input::mouseY() * Input::getMouseSensitivity());
+            if(camera.get_elevation() > 90.0f) camera.set_elevation(90.0f);
+            if(camera.get_elevation() < 0.0f) camera.set_elevation(0.0f);
+            break;
+        case 1:
+            double rel_dir = vehicles[0].direction - camera.get_twist();
+            if(rel_dir > 360)
 
-    double rel_dir = vehicles[0].direction - camera.get_twist();
-
-    if(rel_dir > 95)
-        camera.set_twist(camera.get_twist() + .1);
-    else if(rel_dir < 85)
-        camera.set_twist(camera.get_twist() - .1);
-    */
+            if(rel_dir > 95)
+                camera.set_twist(camera.get_twist() + .1);
+            else if(rel_dir < 85)
+                camera.set_twist(camera.get_twist() - .1);
+            break;
+    }
 
     for(unsigned int i = 0; i < vehicles.size(); ++i){
         if(vehicles[i].use_keys)
-            vehicles[i].draw(t.elapsed()*180, Input::down(Key::moveForward), Input::down(Key::moveBackward), Input::down(Key::turnLeft), Input::down(Key::turnRight), Input::pressed(Key::leftDoor), Input::pressed(Key::rightDoor));
+            vehicles[i].draw(t.elapsed()*180,Input::down(Key::moveForward), Input::down(Key::moveBackward), Input::down(Key::turnLeft), Input::down(Key::turnRight), Input::pressed(Key::leftDoor), Input::pressed(Key::rightDoor));
         else
-<<<<<<< HEAD
-            vehicles[i].draw(t.elapsed()*180,up_2,down_2,left_2,right_2,left_d2,right_d2);
-    sample.draw();
-
-=======
-            vehicles[i].draw(t.elapsed()*180,Input::down(Key::car2moveForward),Input::down(Key::car2moveBackward),Input::down(Key::car2turnLeft),Input::down(Key::car2turnRight),Input::pressed(Key::car2leftDoor),Input::pressed(Key::car2rightDoor));
->>>>>>> b166696b04caa5a020cafab394fa88a95f63902a
+            vehicles[i].draw(t.elapsed()*180,Input::down(Key::car2moveForward),
+                                             Input::down(Key::car2moveBackward),
+                                             Input::down(Key::car2turnLeft),
+                                             Input::down(Key::car2turnRight),
+                                             Input::pressed(Key::car2leftDoor),
+                                             Input::pressed(Key::car2rightDoor));
     }
 }
 // triggered when mouse is clicked
