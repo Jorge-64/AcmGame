@@ -113,11 +113,11 @@ void application::draw_event()
 
     for(unsigned int i = 0; i < vehicles.size(); ++i){
         if(vehicles[i].use_keys)
-            vehicles[i].draw(t.elapsed()*180,Input::down(Key::moveForward),
-                                             Input::down(Key::moveBackward),
-                                             Input::down(Key::turnLeft),
-                                             Input::down(Key::turnRight),
-                                             Input::pressed(Key::leftDoor),
+            vehicles[i].draw(t.elapsed()*180,Input::down(Key::moveForward), 
+                                             Input::down(Key::moveBackward), 
+                                             Input::down(Key::turnLeft), 
+                                             Input::down(Key::turnRight), 
+                                             Input::pressed(Key::leftDoor), 
                                              Input::pressed(Key::rightDoor));
         else
             vehicles[i].draw(t.elapsed()*180,Input::down(Key::car2moveForward),

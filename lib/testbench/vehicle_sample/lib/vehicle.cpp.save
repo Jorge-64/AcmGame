@@ -58,7 +58,7 @@ void Vehicle::draw(double counter,bool up, bool down, bool left, bool right, boo
     //change vehicle's direction based on speed and wheel angle
     direction += 11*speed*sin(turn*0.0174532925);
 
-    //fix the direction to keep nice ranges
+    //fix the direction to keep nice ranges 
     while(direction > 360)
         direction -= 360;
     while(direction < 0)
