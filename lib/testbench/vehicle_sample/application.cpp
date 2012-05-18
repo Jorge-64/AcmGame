@@ -88,7 +88,7 @@ void application::draw_event()
 
     //draw the vehicles
     camera.set_focal_point(vehicles[0].x_pos + 3.2 * cos(vehicles[0].direction * PI / 180.0),vehicles[0].y_pos + 2,vehicles[0].z_pos + 3.2 * -sin(vehicles[0].direction * PI / 180.0));
-    switch(vehicles[0].){
+    switch(1){
         case 0:
             static float relative_twist = 0.0f; //Yes, this is a hack.  Please fix it.
             relative_twist -= Input::mouseX() * Input::getMouseSensitivity();
