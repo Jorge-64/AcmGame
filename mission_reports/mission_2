@@ -1,0 +1,39 @@
+Mission 2 status REport
+========================================
+Mission 2:        "No parking"
+Difficulty:        Medium
+Length:            Medium
+Type:              Global
+Time Limit:        Five Days (May 15)
+========================================
+========================================
+-------------Mission requirements--------------
+*Run the make command in the terminal to compile the sample code.
+----------------------------------------------------------
+Reply to this e-mail with the answers to the quiz below
+----------------------------------------------------------
+
+Quiz:
+1: How do you zoom the camera ? 
+2: What disappears when you enter the "cockpit" of the vehicle?
+3: What changes if you resize the window ?
+4: How many "spokes" are in the vehicle's tires ?
+5: What's wrong with the vehicle's door ?
+
+Answers:
+1: Right click + drag up/down
+2: The other vehicle.
+3: Speed of application and view in world.
+4: 16 per tire
+5: It falls off if make a sharp left turn.
+
+========================================
+Ben
+
+1. Right click and drag in and out with the mouse.
+2. The other car.
+3. the edges of the graph that acts as the ground.
+4. 16
+5. They fall off when you first drive the car.
+
+========================================
