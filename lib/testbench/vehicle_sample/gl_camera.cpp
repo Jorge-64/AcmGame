@@ -6,33 +6,24 @@
 
 void gl_camera::set_elevation(float deg)
 {
-    // get the remainder
-    deg = deg - (int)(deg / 360.0) * 360.0;
+    float new_deg = deg;
 
-    if (deg > 0)
+    // get the remainder
+    new_deg = new_deg - (int)(new_deg / 360.0) * 360.0;
+
+    if (new_deg > 0)
     {
-        if (deg > 180.0)
-            deg = deg - 360;
+        if (new_deg > 180.0)
+            new_deg = new_deg - 360;
     }
     else
     {
-        if (deg < -180.0)
-            deg =  deg + 360;
+        if (new_deg < -180.0)
+            new_deg =  new_deg + 360;
+
     }
 
-    this->elevation = deg;
-}
-void gl_camera::add_elevation(float rel_deg)
-{
-    this->elevation += rel_deg;
-    if(this->elevation < 0) this->elevation = 0;
-    if(this->elevation > 180) this->elevation = 180;
-}
-void gl_camera::try_elevation(float rel_deg)
-{
-    this->elevation += rel_deg;
-    if(this->elevation < 0) this->elevation = 0;
-    if(this->elevation > 180) this->elevation = 180;
+    this->elevation = new_deg;
 }
 
 float gl_camera::get_elevation() const
@@ -57,50 +48,20 @@ void gl_camera::set_twist(float deg)
     {
         if (new_deg < -180.0)
             new_deg =  new_deg + 360;
+
     }
 
     this->twist = new_deg;
 }
-void gl_camera::add_twist(float deg)
-{
-    this-> twist += deg;
-    while(this->twist >= 360.0f) this->twist -= 360.0f;
-    while(this->twist < 0.0f) this->twist += 360.0f;
-}
-void gl_camera::try_twist(float rel_deg)
-{
-    rel_deg -= (90.0f + this->twist);
-    while(rel_deg >= 360.0f) rel_deg -= 360.0f;
-    while(rel_deg < 0.0f) rel_deg += 360.0f;
 
-    if(rel_deg > 10 or rel_deg < 350)
-    if(rel_deg < 180)
-        this->twist += .008*(rel_deg);
-    else
-        this->twist -= .008*(360.0f - rel_deg);
-
-    while(this->twist >= 360.0f) this->twist -= 360.0f;
-    while(this->twist < 0.0f) this->twist += 360.0f;
-}
 float gl_camera::get_twist() const
 {
     return this->twist;
 }
 
-void gl_camera::set_distance(float dist)
+void gl_camera::set_distance(float distance)
 {
-    abs_distance = dist;
-    distance = dist;
-}
-
-void gl_camera::add_distance(float dist)
-{
-    abs_distance += dist;
-}
-void gl_camera::try_distance(float dist)
-{
-    distance += dist;
-    distance += .01*(abs_distance - distance);
+    this->distance = distance;
 }
 
 float gl_camera::get_distance() const
@@ -143,7 +104,7 @@ vector3 gl_camera::get_position() const
 
     p[1] = t1;
     p[2] = t2;
-
+    
     #define PI 3.14159265358979323846264338328
 
     // rotate about y

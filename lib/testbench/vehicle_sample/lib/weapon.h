@@ -3,20 +3,19 @@
 
 #include <GL/glut.h>
 #include <cmath>
-#include "mesh.h"
 
 class Weapon
 {
     public :
         Weapon();
         ~Weapon();
-        void set_model(char *);
-        void draw(float angle);
+        void draw();
         void update(bool toggle);
         void activate();
-        bool is_active();
     private :
-        Mesh model;
+        GLUquadricObj *part_a;
+        GLUquadricObj *part_b;
+        GLUquadricObj *part_c;
         double red;
         double green;
         double blue;

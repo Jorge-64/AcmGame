@@ -51,26 +51,23 @@ void gl_viewer::init(int argc, char *argv[], int width, int height)
 
     this->width = width;
     this->height = height;
-    //first_click = true;
+    first_click = true;
 
     Input::initialize();
-    Input::mapKey(PhysicalKey(GLUT_KEY_F1, SPECIAL_KEY), Key::quit);
-
     Input::mapKey(PhysicalKey('w', NORMAL_KEY), Key::moveForward);
     Input::mapKey(PhysicalKey('s', NORMAL_KEY), Key::moveBackward);
     Input::mapKey(PhysicalKey('a', NORMAL_KEY), Key::turnLeft);
     Input::mapKey(PhysicalKey('d', NORMAL_KEY), Key::turnRight);
     Input::mapKey(PhysicalKey('q', NORMAL_KEY), Key::leftDoor);
     Input::mapKey(PhysicalKey('e', NORMAL_KEY), Key::rightDoor);
-    Input::mapKey(PhysicalKey('b', NORMAL_KEY), Key::attack1);
+    Input::mapKey(PhysicalKey(GLUT_KEY_F1, SPECIAL_KEY), Key::quit);
 
-    Input::mapKey(PhysicalKey(GLUT_KEY_UP, SPECIAL_KEY), Key::car2moveForward);
-    Input::mapKey(PhysicalKey(GLUT_KEY_DOWN, SPECIAL_KEY), Key::car2moveBackward);
-    Input::mapKey(PhysicalKey(GLUT_KEY_LEFT, SPECIAL_KEY), Key::car2turnLeft);
-    Input::mapKey(PhysicalKey(GLUT_KEY_RIGHT, SPECIAL_KEY), Key::car2turnRight);
+    Input::mapKey(PhysicalKey('i', NORMAL_KEY), Key::car2moveForward);
+    Input::mapKey(PhysicalKey('k', NORMAL_KEY), Key::car2moveBackward);
+    Input::mapKey(PhysicalKey('j', NORMAL_KEY), Key::car2turnLeft);
+    Input::mapKey(PhysicalKey('l', NORMAL_KEY), Key::car2turnRight);
     Input::mapKey(PhysicalKey('u', NORMAL_KEY), Key::car2leftDoor);
     Input::mapKey(PhysicalKey('o', NORMAL_KEY), Key::car2rightDoor);
-    Input::mapKey(PhysicalKey(0, MOUSE_BUTTON), Key::attack2);
 
     Input::mapKey(PhysicalKey('p', NORMAL_KEY), Key::pause);
 }
@@ -96,6 +93,116 @@ void gl_viewer::run()
     glutMainLoop();
 }
 
+void gl_viewer::glut_mouse_click_event_wrapper(int button, int state, int x, int y)
+{
+    if (singleton->first_click)
+    {
+        singleton->mouse_last_x = x;
+        singleton->mouse_last_y = y;
+
+        singleton->first_click = false;
+    }
+
+    if (state == gl_viewer::BUTTON_DOWN)
+    {
+        singleton->delta_x_total = 0;
+        singleton->delta_y_total = 0;
+        singleton->num_motion_calls_thus_far = 0;
+        if (button == gl_viewer::LEFT_BUTTON)
+        {
+            singleton->mode = CAM_ROTATE;
+        }
+        else if (button == gl_viewer::RIGHT_BUTTON)
+        {
+            singleton->mode = CAM_DOLLY;
+        }
+        else if (button == gl_viewer::MIDDLE_BUTTON)
+        {
+            singleton->mode = CAM_PAN;
+        }
+    } else if (state == gl_viewer::BUTTON_UP) {
+        singleton->first_click = true;
+    }
+
+    // normally (0,0) is at the top left of screen. Since this is
+    // somewhat unintuitive, it has been changed to be the bottom
+    // left
+    singleton->mouse_click_event(
+        (mouse_button)button, (mouse_button_state)state,
+        x, singleton->height - y
+    );
+}
+
+void gl_viewer::glut_mouse_move_event_wrapper(int x, int y)
+{
+    // normally (0,0) is at the top left of screen. Since this is
+    // somewhat unintuitive, it has been changed to be the bottom
+    // left
+    singleton->mouse_move_event(
+        x, singleton->height - y
+    );
+
+    int delta_x = x - singleton->mouse_last_x;
+    int delta_y = y - singleton->mouse_last_y;
+
+    gl_camera &camera = singleton->camera;
+
+
+    //
+    // the following code is a finite state machine which controls
+    // the camera
+    //
+    if (singleton->mode == CAM_DOLLY)
+    {
+        camera.set_distance(camera.get_distance() + delta_y / 100.0);
+    }
+    else if (singleton->mode == CAM_ROTATE)
+    {
+        singleton->delta_x_total += abs(delta_x);
+        singleton->delta_y_total += abs(delta_y);
+        singleton->num_motion_calls_thus_far += 1;
+
+        if (singleton->num_motion_calls_thus_far > 1)
+        {
+            camera.set_twist(camera.get_twist() + delta_x / 3.0);
+            camera.set_elevation(camera.get_elevation() + delta_y / 3.0);
+            /*
+            if (singleton->delta_x_total > singleton->delta_y_total)
+                singleton->mode = CAM_TWIST;
+            else
+                singleton->mode = CAM_ELEVATE;
+            */
+        }
+    }
+    else if (singleton->mode == CAM_PAN)
+    {
+        singleton->delta_x_total += abs(delta_x);
+        singleton->delta_y_total += abs(delta_y);
+        singleton->num_motion_calls_thus_far += 1;
+
+        if (singleton->num_motion_calls_thus_far > 1)
+        {
+            vector3 focal = camera.get_focal_point();
+            focal.add(camera.get_right() * delta_x/100);
+            focal.add(camera.get_up() * delta_y/100);
+
+            camera.set_focal_point(focal);
+
+            /*
+            if (singleton->delta_x_total > singleton->delta_y_total)
+                singleton->mode = CAM_PAN_HORIZ;
+            else
+                singleton->mode = CAM_PAN_VERT;
+            */
+        }
+    }
+
+    singleton->mouse_last_x = x;
+    singleton->mouse_last_y = y;
+
+    singleton->mouse_move_event(x, y);
+}
+
 void gl_viewer::glut_reshape_event_wrapper(int width, int height)
 {
     singleton->width = width;
@@ -110,7 +217,7 @@ void gl_viewer::glut_reshape_event_wrapper(int width, int height)
     // set up perspective projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0f, width / (float)height, 0.1f, 300.0f);
+    gluPerspective(45.0f, width / (float)height, 0.1f, 500.0f);
     glMatrixMode(GL_MODELVIEW);
 }
 

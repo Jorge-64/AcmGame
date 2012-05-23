@@ -134,7 +134,7 @@ struct Key
     SCI car2turnRight = 34;
     SCI car2leftDoor = 35;
     SCI car2rightDoor = 36;
-
+    
     #undef SCI
 };
 
@@ -153,23 +153,23 @@ public:
     PhysicalKey(int glutVal, int type)
         : v(glutVal), t(type)
     {}
-
+    
     int type() const
     {
         return t;
     }
-
+    
     int glutVal() const
     {
         return v;
     }
-
+    
     bool operator <(const PhysicalKey& rhs) const
     {
         if(t != rhs.t) return t < rhs.t;
         return v < rhs.v;
     }
-
+    
     bool operator ==(const PhysicalKey& rhs) const
     {
         return t == rhs.t && v == rhs.v;
@@ -188,27 +188,27 @@ class Input
 public:
     static void initialize();      //call this exactly once
     static void nextFrame();       //call this exactly once per frame to update key presses
-
+    
     static void mapKey(const PhysicalKey&, KEY); //maps a physical key or button to a logical Key
     static void unmapKey(const PhysicalKey&, KEY); //removes the mapping from a physical key to a specific KEY
     static void unmapKey(const PhysicalKey&); //removes all mappings from a physical key
-
+    
     static bool down(KEY);    //returns whether the key is held
     static bool pressed(KEY); //returns whether the key was pressed during the last frame
-
+    
     static bool isCursorLocked(); //if the cursor is unlocked, the mouse acts normally and can be used to click on buttons
     static void lockCursor();
     static void unlockCursor();
-
+    
     //Mouse sensitivity does nothing on its own.
     //When you get mouse input, you have to multiply it by the current sensitivity value.
     //It is stored here only for convenience.
     static void setMouseSensitivity(float);
     static float getMouseSensitivity();
-
+    
     static int mouseX(); //movement of the mouse in pixels this frame
     static int mouseY(); //relative if the cursor is locked, absolute if unlocked
-
+    
 private:
     static void updateKeyUp(const PhysicalKey&);
     static void updateKeyDown(const PhysicalKey&);
@@ -226,10 +226,10 @@ private:
     static std::vector <KEY> dirtyKeysHeld;
     static std::vector <KEY> keysPressed;
     static std::vector <KEY> dirtyKeysPressed;
-
+    
     static bool cursorLocked;
     static float mouseSensitivity;
-
+    
     static int x;
     static int y;
     static int dirtyX;

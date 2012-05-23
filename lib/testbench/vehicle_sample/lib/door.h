@@ -8,7 +8,8 @@ class Door{
         Door();
         ~Door();
 
-        void draw(bool toggle);
+        void draw_solid();
+        void update(bool toggle);
         void set_open_out(bool set);
 
         void break_off(double x_val, double y_val, double z_val);

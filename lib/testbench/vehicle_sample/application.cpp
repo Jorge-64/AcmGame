@@ -1,5 +1,6 @@
-//ACM GameDev Spring 2012
-
+//AcmGame glut loop wrapper
+#include "lib/mesh.h"
+#include "lib/input.h"
 #include "application.h"
 
 #include <iostream>
@@ -11,14 +12,15 @@ using namespace std;
 #include <GL/glu.h>
 #include <GL/glut.h>
 
-#include "lib/input.h"
 #define PI 3.14159265358979323846264338328
 
-void draw_terrain();
+void draw_grid();
 
-application::application(): prev_time(0.0){}
+application::application()
+{}
 
-application::~application(){}
+application::~application()
+{}
 
 // triggered once after the OpenGL context is initialized
 void application::init_event()
@@ -48,19 +50,21 @@ void application::init_event()
     glEnable(GL_NORMALIZE);
 
     // enable smooth shading
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
 
     // set the cameras default coordinates
-    camera.set_distance(60);//originally 20
-    camera.set_elevation(45);
-    camera.set_twist(0);
+    camera.set_distance(25);//originally 20
+    camera.set_elevation(35);
+    camera.set_twist(45);
 
     t.reset();
     //
-    Robot bot_1(true,0,2.5,-3);
-    Robot bot_2(false,0,2.5,3);
-    robots.push_back(bot_1);
-    robots.push_back(bot_2);
+    Vehicle car_1(true,0,2.5,-3);
+    Vehicle car_2(false,0,2.5,3);
+    vehicles.push_back(car_1);
+    vehicles.push_back(car_2);
+
+    sample.load("cube.obj");
 }
 // triggered each time the application needs to redraw
 void application::draw_event()
@@ -68,73 +72,76 @@ void application::draw_event()
     Input::nextFrame();
     if(Input::down(Key::quit)) exit(0);
 
-    // set the position of the light
-    const GLfloat light_pos1[] = { robots[0].x_pos, 5.0, robots[0].z_pos, 1 };
-    glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
-
     // apply our camera transformation
     camera.apply_gl_transform();
 
-    // draws the terrain and frame at the origin
-    draw_terrain();
+    // set the position of the light
+    const GLfloat light_pos1[] = { 0.0, 10.0, 0.0, 1 };
+    glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
 
-    //focus camera to the robot
-    //camera.set_focal_point(robots[0].x_pos + 3.2 * cos(robots[0].direction * PI / 180.0),robots[0].y_pos + 2,robots[0].z_pos + 3.2 * -sin(robots[0].direction * PI / 180.0));
-    camera.set_focal_point((robots[0].x_pos + robots[1].x_pos)/2,
-                           (robots[0].y_pos + robots[1].y_pos)/2,
-                           (robots[0].z_pos + robots[1].z_pos)/2);
+    // draws the grid and frame at the origin
+    // to be replaced with a draw terrain function
+    draw_grid();
 
-    //manual camera positioning
-    //camera.add_twist(Input::mouseX()*Input::getMouseSensitivity());
-    //camera.add_elevation(Input::mouseY()*Input::getMouseSensitivity());
+    //draw the vehicles
+    camera.set_focal_point(vehicles[0].x_pos + 3.2 * cos(vehicles[0].direction * PI / 180.0),vehicles[0].y_pos + 2,vehicles[0].z_pos + 3.2 * -sin(vehicles[0].direction * PI / 180.0));
+    switch(1){
+        case 0:
+            static float relative_twist = 0.0f; //Yes, this is a hack.  Please fix it.
+            relative_twist -= Input::mouseX() * Input::getMouseSensitivity();
+            while(relative_twist >= 360.0f) relative_twist -= 360.0f;
+            while(relative_twist < 0.0f) relative_twist += 360.0f;
+            camera.set_twist(vehicles[0].direction - 90 + relative_twist);
 
-    //automatic camera positioning
-    //camera.try_twist(robots[0].direction + robots[0].turn);
-    //camera.try_distance(robots[0].speed);
+            camera.set_elevation(camera.get_elevation() + Input::mouseY() * Input::getMouseSensitivity());
+            if(camera.get_elevation() > 90.0f) camera.set_elevation(90.0f);
+            if(camera.get_elevation() < 0.0f) camera.set_elevation(0.0f);
+            break;
+        case 1:
+            double rel_dir = vehicles[0].direction - camera.get_twist();
+            if(rel_dir > 360)
 
-    for(unsigned int i = 0; i < robots.size(); ++i){
-        if(robots[i].use_keys)
-            robots[i].draw(t.elapsed()*180, Input::down(Key::moveForward),
-                                            Input::down(Key::moveBackward),
-                                            Input::down(Key::turnLeft),
-                                            Input::down(Key::turnRight),
-                                            Input::pressed(Key::leftDoor),
-                                            Input::pressed(Key::rightDoor),
-                                            Input::pressed(Key::attack1));
+            if(rel_dir > 95)
+                camera.set_twist(camera.get_twist() + .1);
+            else if(rel_dir < 85)
+                camera.set_twist(camera.get_twist() - .1);
+            break;
+    }
+
+    for(unsigned int i = 0; i < vehicles.size(); ++i){
+        if(vehicles[i].use_keys)
+            vehicles[i].draw(t.elapsed()*180,Input::down(Key::moveForward),
+                                             Input::down(Key::moveBackward),
+                                             Input::down(Key::turnLeft),
+                                             Input::down(Key::turnRight),
+                                             Input::pressed(Key::leftDoor),
+                                             Input::pressed(Key::rightDoor));
         else
-            robots[i].draw(t.elapsed()*180, Input::down(Key::car2moveForward),
-                                            Input::down(Key::car2moveBackward),
-                                            Input::down(Key::car2turnLeft),
-                                            Input::down(Key::car2turnRight),
-                                            Input::pressed(Key::car2leftDoor),
-                                            Input::pressed(Key::car2rightDoor),
-                                            Input::pressed(Key::attack2));
+            vehicles[i].draw(t.elapsed()*180,Input::down(Key::car2moveForward),
+                                             Input::down(Key::car2moveBackward),
+                                             Input::down(Key::car2turnLeft),
+                                             Input::down(Key::car2turnRight),
+                                             Input::pressed(Key::car2leftDoor),
+                                             Input::pressed(Key::car2rightDoor));
     }
-
-    if(robots.size() == 2){
-        double x_diff = robots[0].x_pos - robots[1].x_pos;
-        double z_diff = robots[0].z_pos - robots[1].z_pos;
-        double y_diff = abs(robots[0].y_pos - robots[1].y_pos);
-
-        double dist_sq = x_diff*x_diff + z_diff*z_diff;
-        camera.try_distance(.0001*dist_sq);
-        //std::cout << dist_sq << std::endl;
-        if(dist_sq < 25 and y_diff < 8){
-            robots[0].collision();
-            if(robots[1].attacking())
-                robots[0].snap_item();
-
-            robots[1].collision();
-            if(robots[0].attacking())
-                robots[1].snap_item();
-        }
-    }
-    //this limits the frames per second
-    usleep(max((int)(1000 - (t.elapsed() - prev_time)), 0));
-    prev_time = t.elapsed();
 }
+// triggered when mouse is clicked
+void application::mouse_click_event(
+    mouse_button button, mouse_button_state button_state,int x, int y)
+{}
 
-void draw_terrain()
+// triggered when mouse button is held down and the mouse is
+// moved
+void application::mouse_move_event(int x, int y)
+{}
+
+// triggered when a key is pressed on the keyboard
+void application::keyboard_event(unsigned char key, int x, int y)
+{}
+// triggered when a key is released on the keyboard
+void application::keyboard_up_event(unsigned char key, int x, int y)
+{}
+void draw_grid()
 {
     glDisable(GL_LIGHTING);
     glLineWidth(2.0);
@@ -170,7 +177,7 @@ void draw_terrain()
     glColor3f(.20, .20, .20);
     glBegin(GL_LINES);
 
-    int ncells = 80;
+    int ncells = 100;
     int ncells2 = ncells/2;
 
     for (int i= 0; i <= ncells; i++)
