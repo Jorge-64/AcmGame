@@ -59,6 +59,7 @@ Robot::~Robot()
 {}
 
 void Robot::collision(){
+    if(rand()%10 < 5 and speed > .5*max_speed) snap_item();
     move_back();
     speed *= -.5;
 }
