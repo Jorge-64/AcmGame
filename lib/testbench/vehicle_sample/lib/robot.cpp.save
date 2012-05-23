@@ -3,12 +3,13 @@
 #include <GL/glut.h>
 
 #include <cmath>
-#include "vehicle.h"
+#include "robot.h"
 //Jorge
 //this is the vehicle class implementation
 
-Vehicle::Vehicle()
-:use_keys(false), x_pos(0), y_pos(0), z_pos(0), direction(0.0), speed (0), turn (0.0)
+Robot::Robot()
+:use_keys(false), x_pos(0), y_pos(0), z_pos(0), direction(0.0), speed (0), turn (0.0),
+max_speed(.1), max_turn(30), x_prev(0), z_prev(0)
 {
     wheels[0] = Tire();
     wheels[1] = Tire();
@@ -23,14 +24,23 @@ Vehicle::Vehicle()
 
     doors[0].set_position(1.0,0.0,-1.5);
     doors[1].set_position(1.0,0.0,1.5);
+
+    my_weapon = Weapon();
+    my_weapon.set_model("hammer.obj");
 }
-Vehicle::Vehicle(bool keys, double x, double y, double z)
-:use_keys(keys), x_pos(x), y_pos(y), z_pos(z), direction(0.0), speed (0), turn (0.0)
+Robot::Robot(bool keys, double x, double y, double z)
+:use_keys(keys), x_pos(x), y_pos(y), z_pos(z), direction(0.0), speed (0), turn (0.0),
+max_speed(.1), max_turn(30), x_prev(0), z_prev(0)
 {
     wheels[0] = Tire();
     wheels[1] = Tire();
     wheels[2] = Tire();
     wheels[3] = Tire();
+
+    wheels[0].set_position(-2.0,-1.0,2.0);
+    wheels[1].set_position(2.0,-1.0,2.0);
+    wheels[2].set_position(-2.0,-1.0,-2.0);
+    wheels[3].set_position(2.0,-1.0,-2.0);
 
     doors[0] = Door();
     doors[1] = Door();
@@ -40,77 +50,79 @@ Vehicle::Vehicle(bool keys, double x, double y, double z)
 
     doors[0].set_position(1.0,0.0,-1.5);
     doors[1].set_position(1.0,0.0,1.5);
-    //to see how the doors break off immediately
-    //doors[0].break_off(x_pos + 4.0,y_pos,z_pos - 1.5);
-    //doors[1].break_off(x_pos + 4.0,y_pos,z_pos + 1.5);
+
+    my_weapon = Weapon();
+    my_weapon.set_model("hammer.obj");
 }
 
-Vehicle::~Vehicle()
+Robot::~Robot()
 {}
-void Vehicle::draw(double counter,bool up, bool down, bool left, bool right, bool left_open, bool right_open){
+void Robot::draw(double counter,bool up, bool down, bool left, bool right, bool left_open, bool right_open, bool attack){
     //this updates the x and y coordinates given the car's speed and direction
+    x_prev = x_pos;
+    z_prev = z_pos;
+
     x_pos += speed*cos(direction*0.0174532925);
     z_pos -= speed*sin(direction*0.0174532925);
 
     speed *= .997; //friction effect (slows down over time)
     turn *= .99;   //friction effect, (wheels realign over time)
 
-    //change vehicle's direction based on speed and wheel angle
+    //change Robot's direction based on speed and wheel angle
     direction += 11*speed*sin(turn*0.0174532925);
 
-    //fix the direction to keep nice ranges 
+    //fix the direction to keep nice ranges
     while(direction > 360)
         direction -= 360;
     while(direction < 0)
         direction += 360;
 
     if(up)
-        if(speed < .06)
-            speed += .0003;   //accelerate
+        if(speed < max_speed)
+            speed += .002;   //accelerate
 
     if(down){
-        if(speed > -.06)
-            speed -= .0003;   //decelerate
+        if(speed > -max_speed)
+            speed -= .002;   //decelerate
     }
 
     if(left xor right){       //won't turn left AND right
         if(left){
-            if(turn < 45)     //max turn angle
+            if(turn < max_turn)     //max turn angle
                 turn += 0.4;  //turn speed left
         }
         if(right){
-            if(turn > -45)
+            if(turn > -max_turn)
                 turn -= 0.4;  //turn speed right
         }
     }
-    // yeah, this snaps a door off if you turn to too much
-    if(turn > 30 and not doors[0].is_broken())
-        doors[0].break_off(x_pos + 4.0,y_pos,z_pos - 1.5);
 
     //draw doors where they fell off, not with car
-    if(doors[0].is_broken()) doors[0].update(false);
-    if(doors[1].is_broken()) doors[1].update(false);
+    if(doors[0].free) doors[0].update(false);
+    if(doors[1].free) doors[1].update(false);
 
     glPushMatrix();
         glTranslatef(x_pos, y_pos, z_pos);
         glRotatef(direction, 0, 1, 0);
-        glTranslatef(3, 0, 0);
+
+        //weapon
+        my_weapon.update(attack);
 
         //tires
-        wheels[0].draw(-3.0,-1.0,2.0,speed,0);
-        wheels[1].draw(3.0,-1.0,2.0,speed,turn);
-        wheels[2].draw(-3.0,-1.0,-2.0,speed,0);
-        wheels[3].draw(3.0,-1.0,-2.0,speed,turn);
+        if(not wheels[0].free) wheels[0].draw(speed,0);
+        if(not wheels[1].free) wheels[1].draw(speed,turn);
+        if(not wheels[2].free) wheels[2].draw(speed,0);
+        if(not wheels[3].free) wheels[3].draw(speed,turn);
 
         //doors
         //draw doors with the car
-        if(not doors[0].is_broken()) doors[0].update(left_open);
-        if(not doors[1].is_broken()) doors[1].update(right_open);
+        if(not doors[0].free) doors[0].update(left_open);
+        if(not doors[1].free) doors[1].update(right_open);
 
         //body
         glPushMatrix();
             glColor3f(.3, .3, .5);
-            glScalef(2, .5, 1);
+            glScalef(1.5, .5, 1);
             glutSolidCube(3);
         glPopMatrix();
 
@@ -145,4 +157,37 @@ void Vehicle::draw(double counter,bool up, bool down, bool left, bool right, boo
             glDisable (GL_BLEND);
         glPopMatrix();
     glPopMatrix();
+}
+void Robot::snap_item(int index){
+    switch(index){
+        case 0:
+            if(not wheels[0].free)
+                wheels[0].break_off(x_pos,y_pos,z_pos);
+            break;
+        case 1:
+            if(not wheels[1].free)
+                wheels[1].break_off(x_pos,y_pos,z_pos);
+            break;
+        case 2:
+            if(not wheels[2].free)
+                wheels[2].break_off(x_pos,y_pos,z_pos);
+            break;
+        case 3:
+            if(not wheels[3].free)
+                wheels[3].break_off(x_pos,y_pos,z_pos);
+            break;
+        case 4:
+            if(not doors[0].free)
+                doors[0].break_off(x_pos,y_pos,z_pos);
+            break;
+        case 5:
+            if(not doors[1].free)
+                doors[1].break_off(x_pos,y_pos,z_pos);
+            break;
+        default:break;
+    }
+}
+void Robot::move_back(){
+    x_pos = x_prev;
+    z_pos = z_prev;
 }

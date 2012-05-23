@@ -187,7 +187,6 @@ bool Mesh::load(const std::string& filename)
 }
 void Mesh::draw()
 {
-    glDisable(GL_COLOR_MATERIAL);
     size_t nfaces = get_face_count();
     for (size_t i = 0; i < nfaces; ++i)
     {
@@ -206,7 +205,6 @@ void Mesh::draw()
             glMaterialf(GL_FRONT, GL_SHININESS, mat.ns);
         }
 
-
         glBegin(GL_POLYGON);
         for (size_t j = 0; j < f.vind.size(); ++j)
         {
@@ -221,5 +219,4 @@ void Mesh::draw()
         glEnd();
         glPopMatrix();
     }
-    glEnable(GL_COLOR_MATERIAL);
 }

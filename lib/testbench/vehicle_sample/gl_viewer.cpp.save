@@ -65,9 +65,9 @@ void gl_viewer::init(int argc, char *argv[], int width, int height)
     Input::mapKey(PhysicalKey('b', NORMAL_KEY), Key::attack1);
 
     Input::mapKey(PhysicalKey(GLUT_KEY_UP, SPECIAL_KEY), Key::car2moveForward);
-    Input::mapKey(PhysicalKey(GLUT_KEY_DOWN, SPECIAL_KEY), Key::car2moveBackward);
-    Input::mapKey(PhysicalKey(GLUT_KEY_LEFT, SPECIAL_KEY), Key::car2turnLeft);
-    Input::mapKey(PhysicalKey(GLUT_KEY_RIGHT, SPECIAL_KEY), Key::car2turnRight);
+    Input::mapKey(PhysicalKey(GLUT_KEY_UP, SPECIAL_KEY), Key::car2moveBackward);
+    Input::mapKey(PhysicalKey(GLUT_KEY_UP, SPECIAL_KEY), Key::car2turnLeft);
+    Input::mapKey(PhysicalKey(GLUT_KEY_UP, SPECIAL_KEY), Key::car2turnRight);
     Input::mapKey(PhysicalKey('u', NORMAL_KEY), Key::car2leftDoor);
     Input::mapKey(PhysicalKey('o', NORMAL_KEY), Key::car2rightDoor);
     Input::mapKey(PhysicalKey(0, MOUSE_BUTTON), Key::attack2);

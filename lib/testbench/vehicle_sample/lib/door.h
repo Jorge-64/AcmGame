@@ -8,13 +8,12 @@ class Door{
         Door();
         ~Door();
 
-        void draw_solid();
-        void update(bool toggle);
+        void draw(bool toggle);
         void set_open_out(bool set);
 
-        bool is_broken();
         void break_off(double x_val, double y_val, double z_val);
         void set_position(double x_val, double y_val, double z_val);
+        bool free;
     private :
         double width;
         double height;
@@ -27,7 +26,6 @@ class Door{
         double rel_x;
         double rel_y;
         double rel_z;
-        bool free;
         double pitch;
 };
 

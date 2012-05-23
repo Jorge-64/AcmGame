@@ -21,10 +21,11 @@ a1l:	$(OBJS)
 clean:
 	rm -f *.o lib/*.o $(TARGET)
 
-#gl_viewer.o: gl_viewer.h
-#main.o: application.h gl_viewer.h vector3.h
+gl_viewer.o: gl_viewer.h gl_camera.h vector3.h lib/input.h
+main.o: application.h gl_viewer.h vector3.h
 
-#application.o: application.h gl_viewer.h gl_camera.h vector3.h
-#timer.o: timer.h
-#lib/input.o: lib/input.h
-#lib/robot.o: lib/robot.h lib/door.h lib/weapon.h lib/mesh.h
+application.o: application.h gl_viewer.h gl_camera.h vector3.h lib/input.h
+timer.o: timer.h
+lib/input.o: lib/input.h
+lib/mesh.o: lib/mesh.h
+lib/robot.o: lib/robot.h lib/door.h lib/weapon.h
