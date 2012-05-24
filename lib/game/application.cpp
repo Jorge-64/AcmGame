@@ -1,9 +1,8 @@
 //ACM GameDev Spring 2012
 
-#include "application.h"
-
 #include <iostream>
 #include <cassert>
+#define PI 3.14159265358979323846264338328
 
 using namespace std;
 
@@ -11,8 +10,8 @@ using namespace std;
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+#include "application.h"
 #include "lib/input.h"
-#define PI 3.14159265358979323846264338328
 
 void draw_terrain();
 
@@ -48,17 +47,17 @@ void application::init_event()
     glEnable(GL_NORMALIZE);
 
     // enable smooth shading
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
 
     // set the cameras default coordinates
-    camera.set_distance(50);//originally 20
-    camera.set_elevation(45);
+    camera.set_distance(50);
+    camera.set_elevation(20);
     camera.set_twist(0);
 
     t.reset();
     //
-    Robot bot_1(true,0,2.5,-3);
-    Robot bot_2(false,0,2.5,3);
+    Robot bot_1(false,0,2.5,-3);
+    Robot bot_2(true,0,2.5,3);
     robots.push_back(bot_1);
     robots.push_back(bot_2);
 }
@@ -69,7 +68,8 @@ void application::draw_event()
     if(Input::down(Key::quit)) exit(0);
 
     // set the position of the light
-    const GLfloat light_pos1[] = { robots[0].x_pos, 5.0, robots[0].z_pos, 1 };
+    //const GLfloat light_pos1[] = { robots[0].x_pos, 20.0, robots[0].z_pos, 1 };
+    const GLfloat light_pos1[] = { 0, 20.0, 0, 1 };
     glLightfv(GL_LIGHT1, GL_POSITION, light_pos1);
 
     // apply our camera transformation
@@ -79,7 +79,8 @@ void application::draw_event()
     draw_terrain();
 
     //focus camera to the robot
-    //camera.set_focal_point(robots[0].x_pos + 3.2 * cos(robots[0].direction * PI / 180.0),robots[0].y_pos + 2,robots[0].z_pos + 3.2 * -sin(robots[0].direction * PI / 180.0));
+    //camera.set_focal_point(robots[0].x_pos, robots[0].y_pos + 2,robots[0].z_pos );
+    //focus the camera on both robots
     camera.set_focal_point((robots[0].x_pos + robots[1].x_pos)/2,
                            (robots[0].y_pos + robots[1].y_pos)/2,
                            (robots[0].z_pos + robots[1].z_pos)/2);
@@ -117,9 +118,11 @@ void application::draw_event()
         double y_diff = abs(robots[0].y_pos - robots[1].y_pos);
 
         double dist_sq = x_diff*x_diff + z_diff*z_diff;
+        //this zooms the camera in and out proportional to distance of robots
         camera.try_distance(.0001*dist_sq);
-        //std::cout << dist_sq << std::endl;
-        if(dist_sq < 25 and y_diff < 8){
+
+        //handle the collisions between robots
+        if(dist_sq < 24 and y_diff < 12){
             robots[0].collision();
             if(robots[1].attacking())
                 robots[0].snap_item();

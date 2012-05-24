@@ -1,7 +1,10 @@
 #ifndef WEAPON_H
 #define WEAPON_H
 
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
+
 #include <cmath>
 #include "mesh.h"
 
@@ -11,6 +14,8 @@ class Weapon
         Weapon();
         ~Weapon();
         void set_model(char *);
+        void set_type(unsigned int index);
+        void set_position(double x_val, double y_val, double z_val);
         void draw(float angle);
         void update(bool toggle);
         void activate();
@@ -42,6 +47,7 @@ class Weapon
         double max_index;
         bool free;
         bool active;
+        GLUquadricObj *p;
 };
 
 #endif

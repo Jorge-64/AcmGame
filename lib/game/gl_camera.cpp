@@ -1,6 +1,5 @@
-#include "gl_camera.h"
-
 #include <cmath>
+#include "gl_camera.h"
 
 #include <GL/gl.h>
 

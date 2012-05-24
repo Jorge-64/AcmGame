@@ -2,8 +2,6 @@
 #define ROBOT_H
 
 #include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
 
 #include <cmath>
 #include "door.h"
@@ -21,7 +19,7 @@ class Hubcap
         }
         void draw(){
             int num_spokes = 4;
-            double spoke_width = .05;
+            double spoke_width = .1;
             double angle_step = 360.0/num_spokes;
 
             glPushMatrix();
@@ -29,7 +27,7 @@ class Hubcap
                 glutSolidSphere(.25, 20, 20);
 
                 glRotatef(90,0,1,0);
-                for(int i = 0; i < num_spokes; ++i){
+                for(int i = 0; i <= num_spokes; ++i){
                     glRotatef(angle_step*i,1,0,0);
                     gluCylinder(p, spoke_width, spoke_width, .75, 4, 1);
                 }
@@ -45,7 +43,7 @@ class Tire
 {
     public:
         Tire()
-        :free(false), rel_x(0.0), rel_y(0.0), rel_z(0.0),my_cap(Hubcap()), angle(0), pitch(0)
+        :free(false), rel_x(0.0), rel_y(0.0), rel_z(0.0),my_cap(Hubcap()), angle(0), pitch(0), drop_left(false)
         {}
         ~Tire()
         {}
@@ -55,12 +53,19 @@ class Tire
 
             glPushMatrix();
                 glTranslatef(rel_x, rel_y, rel_z);
-                //glScalef(1, 1, 0.5);
                 if(free){
-                    if(rel_y > 0) rel_y -= .01;
-                    if(pitch < 90) pitch += .5;
+                    if(rel_y > 0)
+                        rel_y -= .01;
+
+                    if(drop_left){
+                        if(pitch < 90)
+                            pitch += .3;
+                    }
+                    else{
+                        if(pitch > -90)
+                            pitch -= .3;
+                    }
                     glRotatef(pitch,1,0,0);
-                    glTranslatef(0, -1.5, 0);
                 }
                 else{
                     glRotatef(turn, 0, 1, 0);
@@ -69,8 +74,6 @@ class Tire
 
                 my_cap.draw();
 
-                //glScalef(1, 1, 0.5);
-                //solid ? glutSolidTorus(0.5, 1, 12, 12) : glutWireTorus(0.5, 1, 12, 12);
                 glColor3f(.2, .2, .2);
                 glutSolidTorus(0.5, 1, 10, 10);
             glPopMatrix();
@@ -88,6 +91,7 @@ class Tire
             rel_x = x_val;
             rel_y = y_val;
             rel_z = z_val;
+            drop_left = (bool)(rel_z > 0);
         }
         bool free;
     private:
@@ -97,6 +101,7 @@ class Tire
         Hubcap my_cap;
         double angle;
         double pitch;
+        bool drop_left;
 };
 class Robot
 {

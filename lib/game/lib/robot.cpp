@@ -1,6 +1,4 @@
 #include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
 
 #include <cmath>
 #include "robot.h"
@@ -16,6 +14,11 @@ max_speed(.1), max_turn(30), x_prev(0), z_prev(0)
     wheels[2] = Tire();
     wheels[3] = Tire();
 
+    wheels[0].set_position(-2.0,-1.0,2.0);
+    wheels[1].set_position(2.0,-1.0,2.0);
+    wheels[2].set_position(-2.0,-1.0,-2.0);
+    wheels[3].set_position(2.0,-1.0,-2.0);
+
     doors[0] = Door();
     doors[1] = Door();
 
@@ -26,7 +29,7 @@ max_speed(.1), max_turn(30), x_prev(0), z_prev(0)
     doors[1].set_position(1.0,0.0,1.5);
 
     my_weapon = Weapon();
-    my_weapon.set_model("hammer.obj");
+    my_weapon.set_model("mallet.obj");
 }
 Robot::Robot(bool keys, double x, double y, double z)
 :use_keys(keys), x_pos(x), y_pos(y), z_pos(z), direction(0.0), speed (0), turn (0.0),
@@ -52,17 +55,21 @@ max_speed(.1), max_turn(30), x_prev(0), z_prev(0)
     doors[1].set_position(1.0,0.0,1.5);
 
     my_weapon = Weapon();
-    my_weapon.set_model("hammer.obj");
+    if(use_keys){
+        my_weapon.set_model("mallet.obj");
+        my_weapon.set_position(0,0,0);
+        my_weapon.set_type(0);
+    }
+    else{
+        my_weapon.set_model("saw.obj");
+        my_weapon.set_position(2,1.2,0);
+        my_weapon.set_type(1);
+    }
 }
 
 Robot::~Robot()
 {}
 
-void Robot::collision(){
-    if(rand()%10 < 5 and speed > .5*max_speed) snap_item();
-    move_back();
-    speed *= -.5;
-}
 void Robot::draw(double counter,bool up, bool down, bool left, bool right, bool left_open, bool right_open, bool attack){
     //this updates the x and y coordinates given the car's speed and direction
     x_prev = x_pos;
@@ -154,9 +161,8 @@ void Robot::draw(double counter,bool up, bool down, bool left, bool right, bool 
             glColor4f(1, 1, 1, .1);
 
             glPushMatrix();
-                glTranslatef(3, .4, 0);
+                glTranslatef(1.6, 1.3, 0);
                 glRotatef(45, 0, 0, 1);
-                glTranslatef(0, 1.3, 0);
                 glScalef(.02, .6, 1);
                 glutSolidCube(2.6);
             glPopMatrix();
@@ -169,6 +175,11 @@ void Robot::draw(double counter,bool up, bool down, bool left, bool right, bool 
             glDisable (GL_BLEND);
         glPopMatrix();
     glPopMatrix();
+}
+void Robot::collision(){
+    if(rand()%10 < 5 and speed > .5*max_speed) snap_item();
+    move_back();
+    speed *= -.6;
 }
 void Robot::snap_item(){
     if(rand()%10 < 2)

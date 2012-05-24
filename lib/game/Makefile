@@ -9,22 +9,20 @@ SRCS = gl_viewer.cpp gl_camera.cpp main.cpp application.cpp timer.cpp lib/door.c
 
 TARGET = fight
 
-#%.o: %.cpp
-#	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
-
-#a1:	$(OBJS)
-#	$(CXX) $(OBJS) -o $(TARGET) $(LIBS)
-
 a1l:	$(OBJS)
 	$(CXX) $(CXXLFAGS) $(CPPFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
 clean:
-	rm -f *.o lib/*.o $(TARGET)
+	rm -f *.o lib/*.o
 
-#gl_viewer.o: gl_viewer.h
-#main.o: application.h gl_viewer.h vector3.h
+main.o: application.h
+gl_viewer.o: gl_viewer.h gl_camera.h
 
-#application.o: application.h gl_viewer.h gl_camera.h vector3.h
-#timer.o: timer.h
-#lib/input.o: lib/input.h
-#lib/robot.o: lib/robot.h lib/door.h lib/weapon.h lib/mesh.h
+application.o: application.h gl_viewer.h timer.h lib/robot.h
+
+timer.o: timer.h
+lib/door.o: lib/door.h
+lib/input.o: lib/input.h
+lib/mesh.o: lib/mesh.h
+lib/robot.o: lib/robot.h lib/door.h lib/weapon.h
+lib/weapon.o: lib/weapon.h lib/mesh.h
